@@ -844,7 +844,7 @@ class Maintenance:
         if from_t > to_t:
             raise ValueError("To timestamp is earlier than From timestamp")
 
-    def pm_add_device(self, from_t, to_t, device, m_type="exact"):
+    def add_device(self, from_t, to_t, device, m_type="exact"):
         """Add Maintenance window on a device level
 
         m_type:
@@ -883,10 +883,10 @@ class Maintenance:
         data2 = response.data.split(" ", 3)
         return int(data2[2])
 
-    def pm_add_interface(self, from_t, to_t, device, interface):
-        self.pm_add_interface_byname(from_t, to_t, device, interface)
+    def add_interface(self, from_t, to_t, device, interface):
+        self.add_interface_byname(from_t, to_t, device, interface)
 
-    def pm_add_interface_byname(self, from_t, to_t, device, interface):
+    def add_interface_byname(self, from_t, to_t, device, interface):
         """Adds Maintenance window for interfaces based on interface name
 
         Does a regex match on interfaces on a device
@@ -924,7 +924,7 @@ class Maintenance:
         data2 = response.data.split(" ", 3)
         return int(data2[2])
 
-    def pm_add_interface_bydescr(self, from_t, to_t, description):
+    def add_interface_bydescr(self, from_t, to_t, description):
         """Add Maintenance window on interface level by interface description
 
         Does a regex global match on all interfaces in zino
@@ -961,7 +961,7 @@ class Maintenance:
         data2 = response.data.split(" ", 3)
         return int(data2[2])
 
-    def pm_list(self):
+    def list(self):
         """List ID of all active Maintenance windows"""
         # Lists all Maintenance periods registrered
         # pm list
@@ -977,7 +977,7 @@ class Maintenance:
 
         return ids
 
-    def pm_cancel(self, id):
+    def cancel(self, id):
         """Cancel a Maintenance window"""
         # Cansels a Maintenance period
         # pm cancel
@@ -993,7 +993,7 @@ class Maintenance:
         else:
             return True
 
-    def pm_get_details(self, id):
+    def get_details(self, id):
         """Get details of a Maintenance window"""
         # Get details of a Maintenance period
         # pm details
@@ -1018,7 +1018,7 @@ class Maintenance:
 
         return res
 
-    def pm_get_matching(self, id):
+    def get_matching(self, id):
         """Get elements matching a Maintenance window"""
         # TODO: OUTPUT NEEDS A REWRITE!
         # Get list of all ports and devices matching a Maintenance id
@@ -1040,7 +1040,7 @@ class Maintenance:
         #                          5: interface descr
         return [d.split(" ", 5)[1::] for d in response.data]
 
-    def pm_add_log(self, id, message):
+    def add_log(self, id, message):
         """Add log entry to a Maintenance window"""
         # Adds a log message on this PM
         # pm addlog
@@ -1071,7 +1071,7 @@ class Maintenance:
             raise Exception("Not getting 200 OK from server: %s" % self._buff)
         return True
 
-    def pm_get_log(self, id):
+    def get_log(self, id):
         """List all log entries of a Maintenance window"""
         # Get log of a PM
         # pm log
