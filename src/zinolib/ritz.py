@@ -518,9 +518,9 @@ class ritz:
         if not self.authenticated:
             raise AuthenticationError("User not authenticated")
 
-    def check_id(self, id_, id_name="Id"):
+    def check_id(self, id_):
         if not isinstance(id_, int):
-            raise TypeError(f"{id_name} needs to be an integer")
+            raise TypeError(f"CaseID needs to be an integer")
 
     def case(self, id):
         """Get a zino Case object
@@ -657,7 +657,7 @@ class ritz:
         #   Parameters: caseID
         #   Returns a list of historylines (timestamp, message)??
         self.check_connection()
-        self.check_id(caseid, "CaseID")
+        self.check_id(caseid)
 
         response = self._request(b"gethist %d" % caseid)
 
@@ -673,7 +673,7 @@ class ritz:
         #   Parameters: caseID
         #   Returns a list of loglines (timestamp, message)
         self.check_connection()
-        self.check_id(caseid, "CaseID")
+        self.check_id(caseid)
 
         response = self._request(b"getlog %d" % caseid)
 
@@ -818,6 +818,32 @@ class ritz:
             )
         return True
 
+    def init_notifier(self):
+        notif = notifier(self)
+        notif.connect()
+        return notif
+
+
+class Maintenance:
+
+    def __init__(self, session):
+        self._zino = session
+        self._request = self._zino._request
+        self._sock = self._zino._sock
+        self.check_connection = self._zino.check_connection
+
+    def check_id(self, id_):
+        if not isinstance(id_, int):
+            raise TypeError(f"Id needs to be an integer")
+
+    def check_timestamp_range(self, from_t, to_t):
+        if not isinstance(from_t, datetime):
+            raise TypeError("from_t is not a datetime")
+        if not isinstance(to_t, datetime):
+            raise TypeError("to_t is not a datetime")
+        if from_t > to_t:
+            raise ValueError("To timestamp is earlier than From timestamp")
+
     def pm_add_device(self, from_t, to_t, device, m_type="exact"):
         """Add Maintenance window on a device level
 
@@ -837,13 +863,8 @@ class ritz:
         #  Function returns id of added PM
         # str: matcher mot device-name, kan bruke ? - en char * - flere char
         self.check_connection()
+        self.check_timestamp_range(from_t, to_t)
 
-        if not isinstance(from_t, datetime):
-            raise TypeError("from_t is not a datetime")
-        if not isinstance(to_t, datetime):
-            raise TypeError("to_t is not a datetime")
-        if from_t > to_t:
-            raise ValueError("To timestamp is earlier than From timestamp")
         if m_type not in ("exact", "str", "regexp"):
             raise Exception("Unknown m_type, needs to be exact, str or regexp")
 
@@ -886,13 +907,7 @@ class ritz:
         #  Returns 200 with id on PM on sucessfull pm add
         #  Function returns id of added PM
         self.check_connection()
-
-        if not isinstance(from_t, datetime):
-            raise TypeError("from_t is not a datetime")
-        if not isinstance(to_t, datetime):
-            raise TypeError("to_t is not a datetime")
-        if from_t > to_t:
-            raise Exception("To timestamp is earlier than From timestamp")
+        self.check_timestamp_range(from_t, to_t)
 
         from_ts = mktime(from_t.timetuple())
         to_ts = mktime(to_t.timetuple())
@@ -929,13 +944,7 @@ class ritz:
         #  Returns 200 with id on PM on sucessfull pm add
         #  Function returns id of added PM
         self.check_connection()
-
-        if not isinstance(from_t, datetime):
-            raise TypeError("from_t is not a datetime")
-        if not isinstance(to_t, datetime):
-            raise TypeError("to_t is not a datetime")
-        if from_t > to_t:
-            raise Exception("To timestamp is earlier than From timestamp")
+        self.check_timestamp_range(from_t, to_t)
 
         from_ts = mktime(from_t.timetuple())
         to_ts = mktime(to_t.timetuple())
@@ -1079,11 +1088,6 @@ class ritz:
         # print(data)
         return _decode_history(response.data)
         # raise NotImplementedError("Not Implemented")
-
-    def init_notifier(self):
-        notif = notifier(self)
-        notif.connect()
-        return notif
 
 
 class notifier:
