@@ -2,7 +2,7 @@ import subprocess
 import re
 import sys
 import os
-from ritz import ritz
+from zinolib.ritz import ritz, Maintenance
 from datetime import datetime, timedelta
 
 
@@ -27,12 +27,13 @@ def main():
     ports = collect_interfaces()
     if ports:
         with ritz(server, username=user, password=secret) as s:
+            maintenance = Maintenance(s)
             for device, porttype, port in ports:
                 try:
-                    id = s.pm_add_interface(datetime.now() + timedelta(seconds=15),
-                                            datetime.now() + timedelta(minutes=30),
-                                            device,
-                                            r"^{}(\.\d+)?$".format(port))
+                    id = maintenance.add_interface(datetime.now() + timedelta(seconds=15),
+                                                   datetime.now() + timedelta(minutes=30),
+                                                   device,
+                                                   r"^{}(\.\d+)?$".format(port))
                     print("Scheduled maintenance for %s %s : id %s" % (device, port, id))
                 except Exception as e:
                     print("Unable to schedule maintenance for %s %a : %s" (device, port, e))

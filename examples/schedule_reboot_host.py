@@ -4,7 +4,7 @@ import re
 import sys
 import os
 import socket
-from ritz import ritz
+from zinolib.ritz import ritz, Maintenance
 from datetime import datetime, timedelta
 
 
@@ -42,12 +42,13 @@ def main():
 
     print("Creating Maintenance on physical interfaces")
     with ritz(server, username=user, password=secret) as s:
+        maintenance = Maintenance(s)
         try:
             # Actually searching for ', fqdn.domain.ext'
-            pm1 = s.pm_add_interface_bydescr(datetime.now() + timedelta(seconds=5),
-                                             datetime.now() + timedelta(minutes=30),
-                                             r',\s%s' % fqdn.replace(r'.',r'\.'))
-            pm1matching = s.pm_get_matching(pm1)
+            pm1 = maintenance.add_interface_bydescr(datetime.now() + timedelta(seconds=5),
+                                                    datetime.now() + timedelta(minutes=30),
+                                                    r',\s%s' % fqdn.replace(r'.',r'\.'))
+            pm1matching = maintenance.get_matching(pm1)
 
             for i in pm1matching:
                 print("Scheduled maintenance for %s %s %s" % (i[1], i[3], pm1))

@@ -1,4 +1,4 @@
-from ritz import ritz, notifier, parse_tcl_config
+from zinolib.ritz import ritz, notifier, parse_tcl_config, Maintenance
 from pprint import pprint
 from time import sleep
 import re
@@ -33,48 +33,49 @@ def main():
 
   with ritz(c_server, username=c_user, password=c_secret) as sess:
     print("List all PMs:")
-    pm = sess.pm_list()
+    maintenance = Maintenance(sess)
+    pm = maintenance.list()
     print(pm)
     for i in pm:
       print("canceling %d" % i)
-      sess.pm_cancel(i)
+      maintenance.cancel(i)
 
     print("Schedule test pm:")
-    pm = sess.pm_add_device(datetime.now() + timedelta(minutes=1),
+    pm = maintenance.add_device(datetime.now() + timedelta(minutes=1),
                             datetime.now() + timedelta(minutes=2),
                             "teknobyen-gw4")
     print("sheduled: %s" % pm)
-    pm2 = sess.pm_add_interface(datetime.now() + timedelta(minutes=1),
+    pm2 = maintenance.add_interface(datetime.now() + timedelta(minutes=1),
                                 datetime.now() + timedelta(minutes=2),
                                 "uninett-tor-sw3",
                                 "xe-0/0/19")
     print("sheduled: %s" % pm2)
 
     print("List all PMs:")
-    pms = sess.pm_list()
+    pms = maintenance.list()
     print(pm)
 
-    print("pm_get_details %s:" % pm)
-    p = sess.pm_get_details(pm)
+    print("get_details %s:" % pm)
+    p = maintenance.get_details(pm)
     for k in p.keys():
       print("%-10s %-s" % (k, p[k]))
 
-    print("pm_get_details %s:" % pm2)
-    p = sess.pm_get_details(pm2)
+    print("get_details %s:" % pm2)
+    p = maintenance.get_details(pm2)
     for k in p.keys():
       print("%-10s %-s" % (k, p[k]))
 
-    print("pm_get_matching: %s" % pm)
-    for p in sess.pm_get_matching(pm):
+    print("get_matching: %s" % pm)
+    for p in maintenance.get_matching(pm):
       print(p)
 
-    print("pm_get_matching:%s" % pm2)
-    for p in sess.pm_get_matching(pm2):
+    print("get_matching:%s" % pm2)
+    for p in maintenance.get_matching(pm2):
       print(p)
 
-    print("pm_cancel:")
-    print(sess.pm_cancel(pm))
-    print(sess.pm_cancel(pm2))
+    print("cancel:")
+    print(maintenance.cancel(pm))
+    print(maintenance.cancel(pm2))
 
   return
 

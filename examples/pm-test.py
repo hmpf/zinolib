@@ -1,4 +1,4 @@
-from ritz import ritz, notifier, parse_tcl_config
+from zinolib.ritz import ritz, notifier, parse_tcl_config, Maintenance
 from pprint import pprint
 from time import sleep
 import re
@@ -40,44 +40,45 @@ def main():
   sess = ritz(c_server)
   sess.connect()
   sess.authenticate(c_user, c_secret)
+  maintenance = Maintenance(sess)
 
   print("List all PMs:")
-  pm = sess.pm_list()
+  pm = maintenance.list()
   print(pm)
   #for i in pm:
   #  print("canceling %d" % i)
-  #  sess.pm_cancel(i)
+  #  maintenance.cancel(i)
 
   print("Schedule test pm:")
-  pm = sess.pm_add_device(datetime.now()+timedelta(minutes=1),
+  pm = maintenance.add_device(datetime.now()+timedelta(minutes=1),
                           datetime.now()+timedelta(minutes=2),
                           "teknobyen-gw*", m_type='str')
   print("Scheduled")
 
   print("List all PMs:")
-  pms = sess.pm_list()
+  pms = maintenance.list()
   print(pm)
 
-  print("pm_get_details:")
-  print(sess.pm_get_details(pm))
+  print("get_details:")
+  print(maintenance.get_details(pm))
 
-  print("pm_get_log:")
-  print(sess.pm_get_log(pm))
+  print("get_log:")
+  print(maintenance.get_log(pm))
 
-  print("pm_add_log:")
-  sess.pm_add_log(pm, "This is a test log :)")
+  print("add_log:")
+  maintenance.add_log(pm, "This is a test log :)")
 
-  print("pm_get_details:")
-  print(sess.pm_get_details(pm))
+  print("get_details:")
+  print(maintenance.get_details(pm))
 
-  print("pm_get_log:")
-  print(sess.pm_get_log(pm))
+  print("get_log:")
+  print(maintenance.get_log(pm))
 
-  print("pm_get_matching:")
-  print(sess.pm_get_matching(pm))
+  print("get_matching:")
+  print(maintenance.get_matching(pm))
 
-  print("pm_cancel:")
-  print(sess.pm_cancel(pm))
+  print("cancel:")
+  print(maintenance.cancel(pm))
 
 
   return
